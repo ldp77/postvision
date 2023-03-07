@@ -11,7 +11,7 @@
     <main class="container">
         <h1>PostVision</h1>
 
-        <form method="post">
+        <form method="post" action="{{ url_for('home') }}">
             <div class="grid">
                 <input type="text" id="teamname" name="teamname" placeholder="Team Name" required>
                 <button type="submit">Query</button>

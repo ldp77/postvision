@@ -1,10 +1,48 @@
 {% extends 'base.html' %}
 
 {% block body %}
- 
-<div class="grid">
-    
 
+
+{% if 'error' in query_result %}
+<center>
+    <div>
+        {{ query_result['error'] }}
+    </div>
+</center>
+{% else %}
+<center>
+    <div class="grid">
+    
+        {% if query_result['makes_tournament_prediction'] == '1' %}
+        <div class="container" style="background-color: green; color: white">
+            Makes Tournament
+        </div>
+        <div class="container" style="background-color: green; color: white">
+            {{ query_result['seed_prediction'] }} Seed
+        </div>
+        <div class="container" style="background-color: green; color: white">
+            {{ query_result['result_prediction'] }} Finish
+        </div>
+        {% else %}
+        <div class="container" style="background-color: red; color: white">
+            Misses Tournament
+        </div>
+        {% endif %}
+    
+    </div>
+</center>
+
+
+<h2>Most Similar Teams</h2>
+
+{% for team in query_result['most_similar'] %}
+<div class="container">
+    {{ team }}
 </div>
+{% endfor %}
+
+{% endif %}
+
+
  
 {% endblock %}
