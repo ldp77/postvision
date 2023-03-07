@@ -1,3 +1,28 @@
+"""
+This file contains the steps necessary to read data, train models, and write assets for PostVision.
+
+Usage:
+
+    python train_models.py [--only [makes_tournament / seed / result / {arbitrary}]]
+
+    --only [OPTIONAL]: List of models to train and save
+        - If not specified, will train and save the makes_tournament, seed, and result models
+        - If specified, will train only the models given (makes_tournament / seed / result)
+        - If specified and an arbitrary value is given (ie. not makes_tournament / seed / result, then no models will be trained. Data is still updated.)
+
+Workflow:
+
+    - Parse arguments to select models for training
+    - Read csv data into dataframes and clean
+    - Train models which have been selected
+    - Save models and dataframes via joblib
+
+The execution of this file builds the assets folder, which can be used to create a PostVisionInstance.
+
+This way, the models do not have to be trained (time consuming) each time the app restarts.
+"""
+
+
 import argparse
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
@@ -9,6 +34,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import GridSearchCV
 import joblib
 
+# Read command line arguments to determine which models will be trained
 parser = argparse.ArgumentParser()
 parser.add_argument("--only", nargs="+", help="list of string values")
 
@@ -39,6 +65,7 @@ else:
             print(f'Unknown Argument: {model}')
 
 
+# Read csv data into dataframes
 df13_20 = pd.read_csv('data/cbb.csv')
 df21 = pd.read_csv('data/cbb21.csv')
 df23 = pd.read_csv('data/cbb23.csv')
@@ -54,10 +81,10 @@ for i, row in df23.iterrows():
 rows_to_drop = []
 for i, row in df23.iterrows():
     if row['2P%D'] == '2P%D':
-        rows_to_drop.append(i)
-        
+        rows_to_drop.append(i)        
 df23 = df23.drop(rows_to_drop)
 
+# A few other things so that the 2023 data is formatted in the same way as historic data
 df23['W'] = df23.apply(lambda row: re.split('-', row['Rec'])[0], axis=1)
 
 df23['YEAR'] = df23.apply(lambda row: 2023, axis=1)
@@ -160,6 +187,8 @@ if train_makes_tournament:
     joblib.dump(makes_tournament_classifier, 'assets/models/makes_tournament_classifier.joblib')
 
 
+# This query filters out teams that did not make the tournament
+# Uses the fact that (NaN == NaN) returns False, so the below condition only returns true if POSTSEASON has a value
 tournament_teams_query = master_df.query('POSTSEASON == POSTSEASON')
 tournament_teams_df = master_df.iloc[tournament_teams_query.index.values]
 X_tournament_teams = historic_teams_scaled_and_vectorized_df.loc[tournament_teams_query.index.values].to_numpy()
@@ -167,6 +196,7 @@ X_tournament_teams = historic_teams_scaled_and_vectorized_df.loc[tournament_team
 Y_seeds_df = tournament_teams_df['SEED']
 Y_result_df = tournament_teams_df['POSTSEASON']
 
+# Seed and result classifiers use KNN with GridSearchCV
 seed_classifier_base = KNeighborsClassifier()
 result_classifier_base = KNeighborsClassifier()
 
