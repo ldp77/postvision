@@ -10,7 +10,7 @@ def home():
     if request.method == 'POST':
         teamname = request.form['teamname']
         return redirect(url_for('result', name=teamname))
-    return render_template('base.html')
+    return render_template('home.html')
 
 @app.route('/result/<name>', methods=['POST', 'GET'])
 def result(name):

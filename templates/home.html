@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h2>Instructions</h2>
+
+<div class="container">
+    Enter the name of a Division I NCAA Basketball team to view their postseason outlook
+</div>
+<div class="container">
+    You can also use the route "direct/{teamname}" to recieve the raw JSON data for the team's postseason outlook
+</div>
+<div class="container">
+    Finally, the route "/report" can be used to get predictions for all of this year's teams in one JSON object.
+</div>
+
+{% endblock body %}
