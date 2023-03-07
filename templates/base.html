@@ -5,11 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="static/pico.css">
+    <link rel="stylesheet" href= "{{ url_for('static',filename='pico.css') }}">
 </head>
 <body>
     <main class="container">
         <h1>PostVision</h1>
+
+        <form method="post">
+            <div class="grid">
+                <input type="text" id="teamname" name="teamname" placeholder="Team Name" required>
+                <button type="submit">Query</button>
+            </div>
+        </form>
+
+        {% block body %}
+        {% endblock body %}
     </main>
 </body>
 </html>
